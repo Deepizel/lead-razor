@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils'
 
 export const dashboardNavItems = [
   { to: '/', label: 'Leads', end: true },
+  { to: '/categories', label: 'Categories' },
   { to: '/analytics/pipeline', label: 'Pipeline' },
   { to: '/analytics/roi', label: 'ROI' },
 ] as const

@@ -12,6 +12,7 @@ const PipelineAnalyticsPage = lazy(
   () => import('@/pages/dashboard/PipelineAnalyticsPage'),
 )
 const ROIDashboardPage = lazy(() => import('@/pages/dashboard/ROIDashboardPage'))
+const CategoriesPage = lazy(() => import('@/pages/categories/CategoriesPage'))
 
 function PageLoader() {
   return (
@@ -35,6 +36,7 @@ export default function AppRouter() {
           <Route element={<DashboardLayout />}>
             <Route index element={<LeadsDashboard />} />
             <Route path="leads/:id" element={<LeadDetailPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
             <Route path="analytics/pipeline" element={<PipelineAnalyticsPage />} />
             <Route path="analytics/roi" element={<ROIDashboardPage />} />
           </Route>
