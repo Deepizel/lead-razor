@@ -1,7 +1,18 @@
-const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, '') ?? ''
+import type { ApiErrorBody } from '@/types/api-lead'
+
+/** Server root, e.g. http://localhost:5000 — paths include /api/... */
+function resolveBaseUrl(): string {
+  const raw =
+    import.meta.env.VITE_API_BASE_URL ??
+    import.meta.env.VITE_API_URL ??
+    ''
+  return raw.replace(/\/$/, '')
+}
+
+export const apiBaseUrl = resolveBaseUrl()
 
 export function hasApiBaseUrl(): boolean {
-  return Boolean(baseUrl)
+  return Boolean(apiBaseUrl)
 }
 
 export class ApiError extends Error {
@@ -14,38 +25,66 @@ export class ApiError extends Error {
   }
 }
 
+export interface ApiRequestOptions extends RequestInit {
+  timeoutMs?: number
+}
+
 export async function apiRequest<T>(
   path: string,
-  options: RequestInit = {},
+  options: ApiRequestOptions = {},
 ): Promise<T> {
-  if (!baseUrl) {
-    throw new Error('VITE_API_URL is not configured')
+  if (!apiBaseUrl) {
+    throw new Error('VITE_API_BASE_URL is not configured')
   }
 
-  const headers = new Headers(options.headers)
-  if (options.body && !headers.has('Content-Type')) {
+  const { timeoutMs = 30_000, ...init } = options
+  const headers = new Headers(init.headers)
+  if (init.body && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
   }
 
-  const response = await fetch(`${baseUrl}${path}`, {
-    ...options,
-    headers,
-  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
 
-  if (!response.ok) {
-    let message = response.statusText
-    try {
-      const body = (await response.json()) as { message?: string }
-      if (body.message) message = body.message
-    } catch {
-      /* ignore */
+  try {
+    const response = await fetch(`${apiBaseUrl}${path}`, {
+      ...init,
+      headers,
+      signal: controller.signal,
+    })
+
+    if (!response.ok) {
+      let message = response.statusText
+      try {
+        const body = (await response.json()) as ApiErrorBody
+        if (body.error) message = body.error
+      } catch {
+        /* ignore */
+      }
+      throw new ApiError(message, response.status)
     }
-    throw new ApiError(message, response.status)
-  }
 
-  if (response.status === 204) {
-    return undefined as T
-  }
+    if (response.status === 204) {
+      return undefined as T
+    }
 
-  return response.json() as Promise<T>
+    return response.json() as Promise<T>
+  } catch (err) {
+    if (err instanceof Error && err.name === 'AbortError') {
+      throw new ApiError('Request timed out', 408)
+    }
+    throw err
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+export async function checkApiHealth(): Promise<boolean> {
+  if (!apiBaseUrl) return false
+  try {
+    const res = await fetch(apiBaseUrl, { method: 'GET' })
+    return res.ok
+  } catch {
+    return false
+  }
 }

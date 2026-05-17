@@ -1,6 +1,10 @@
+import { fetchLeadDetail, refreshLeadSnapshot, sendLeadEmail } from '@/api/leads-remote'
+import { hasApiBaseUrl } from '@/lib/api-client'
+import { mapLeadDetailResponse } from '@/lib/map-lead-detail'
 import { mockLeads, pipelineStages, roiMetrics } from '@/data/mockLeads'
 import { getUploadedDateRange, isWithinUploadedRange } from '@/lib/lead-utils'
 import type { Lead, LeadFilters } from '@/types/lead'
+import type { LeadDetailResponse, SnapshotRefreshMetadata } from '@/types/api-lead'
 
 const delay = (ms = 400) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -37,9 +41,38 @@ export async function fetchLeads(filters?: LeadFilters): Promise<Lead[]> {
 }
 
 export async function fetchLeadById(id: string): Promise<Lead | undefined> {
+  if (hasApiBaseUrl()) {
+    try {
+      const data = await fetchLeadDetail(id)
+      return mapLeadDetailResponse(data)
+    } catch {
+      return undefined
+    }
+  }
+
   await delay(300)
   return mockLeads.find((lead) => lead.id === id)
 }
+
+export async function refreshLeadById(
+  id: string,
+  metadata?: SnapshotRefreshMetadata,
+): Promise<Lead> {
+  if (!hasApiBaseUrl()) {
+    throw new Error('Snapshot refresh requires VITE_API_BASE_URL')
+  }
+  const data = await refreshLeadSnapshot(id, metadata)
+  return mapLeadDetailResponse(data)
+}
+
+export async function sendLeadEmailById(id: string): Promise<void> {
+  if (!hasApiBaseUrl()) {
+    throw new Error('Email send requires VITE_API_BASE_URL')
+  }
+  await sendLeadEmail(id)
+}
+
+export type { LeadDetailResponse }
 
 export async function fetchPipelineStages() {
   await delay(300)

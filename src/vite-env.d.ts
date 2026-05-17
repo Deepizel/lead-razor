@@ -1,6 +1,9 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
+  /** Server root, e.g. http://localhost:5000 */
+  readonly VITE_API_BASE_URL?: string
+  /** @deprecated Use VITE_API_BASE_URL */
   readonly VITE_API_URL?: string
 }
 
