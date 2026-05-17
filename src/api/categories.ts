@@ -1,5 +1,4 @@
 import { seedCategories } from '@/data/mockCategories'
-import { apiRequest, hasApiBaseUrl } from '@/lib/api-client'
 import type { Category, CategoryInput } from '@/types/category'
 
 const STORAGE_KEY = 'leadrazor-categories'
@@ -66,19 +65,11 @@ async function mockDeleteCategory(id: string): Promise<void> {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  if (hasApiBaseUrl()) {
-    return apiRequest<Category[]>('/categories')
-  }
+  // GET /api/categories not live yet — see API_REFERENCE.md
   return mockFetchCategories()
 }
 
 export async function createCategory(input: CategoryInput): Promise<Category> {
-  if (hasApiBaseUrl()) {
-    return apiRequest<Category>('/categories', {
-      method: 'POST',
-      body: JSON.stringify(input),
-    })
-  }
   return mockCreateCategory(input)
 }
 
@@ -86,18 +77,9 @@ export async function updateCategory(
   id: string,
   input: CategoryInput,
 ): Promise<Category> {
-  if (hasApiBaseUrl()) {
-    return apiRequest<Category>(`/categories/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify(input),
-    })
-  }
   return mockUpdateCategory(id, input)
 }
 
 export async function deleteCategory(id: string): Promise<void> {
-  if (hasApiBaseUrl()) {
-    return apiRequest<void>(`/categories/${id}`, { method: 'DELETE' })
-  }
   return mockDeleteCategory(id)
 }

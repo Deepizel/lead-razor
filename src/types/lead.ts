@@ -15,6 +15,12 @@ export interface Lead {
   source: string
   lastAction: string
   createdAt: string
+  /** Populated from API snapshot when available */
+  emailSubject?: string
+  emailBody?: string
+  emailSentAt?: string | null
+  hasSnapshot?: boolean
+  emailsSent?: number
 }
 
 export type UploadedDatePreset = 'all' | '7d' | '30d' | '90d' | 'custom'

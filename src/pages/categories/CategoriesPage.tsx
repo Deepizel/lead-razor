@@ -5,7 +5,6 @@ import { DeleteCategoryDialog } from '@/components/categories/DeleteCategoryDial
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { hasApiBaseUrl } from '@/lib/api-client'
 import { useCategories } from '@/hooks/useCategories'
 import type { Category } from '@/types/category'
 
@@ -34,13 +33,11 @@ export default function CategoriesPage() {
             Define ICP segments — offering feeds the AI prompt; statement drives fit
             scoring
           </p>
-          {!hasApiBaseUrl() && (
-            <p className="mt-1 text-[0.625rem] text-muted-foreground">
-              Using local mock storage. Set{' '}
-              <code className="rounded bg-muted px-1">VITE_API_URL</code> to connect your
-              API.
-            </p>
-          )}
+          <p className="mt-1 text-[0.625rem] text-muted-foreground">
+            Categories use local storage until{' '}
+            <code className="rounded bg-muted px-1">GET /api/categories</code> is available
+            (see API_REFERENCE.md).
+          </p>
         </div>
         <Button size="sm" className="w-full shrink-0 sm:w-auto" onClick={openCreate}>
           Add category

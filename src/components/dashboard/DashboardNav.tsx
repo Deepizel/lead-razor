@@ -20,7 +20,7 @@ export function DashboardNav({ onNavigate, className }: DashboardNavProps) {
         <NavLink
           key={item.to}
           to={item.to}
-          end={item.end}
+          end={'end' in item ? item.end : undefined}
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(

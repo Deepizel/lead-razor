@@ -1,6 +1,15 @@
-import { useQuery } from '@tanstack/react-query'
-import { fetchLeadById, fetchLeads, fetchPipelineStages, fetchROIMetrics } from '@/api/leads'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+  fetchLeadById,
+  fetchLeads,
+  fetchPipelineStages,
+  fetchROIMetrics,
+  refreshLeadById,
+  sendLeadEmailById,
+} from '@/api/leads'
+import { hasApiBaseUrl } from '@/lib/api-client'
 import { useUiStore } from '@/stores/uiStore'
+import type { SnapshotRefreshMetadata } from '@/types/api-lead'
 
 export const leadKeys = {
   all: ['leads'] as const,
@@ -22,9 +31,47 @@ export function useLeads() {
 export function useLead(id: string | undefined) {
   return useQuery({
     queryKey: leadKeys.detail(id ?? ''),
-    queryFn: () => fetchLeadById(id!),
+    queryFn: async () => {
+      const lead = await fetchLeadById(id!)
+      if (!lead) throw new Error('Lead not found')
+      return lead
+    },
     enabled: Boolean(id),
   })
+}
+
+export function useRefreshLeadSnapshot(leadId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (metadata?: SnapshotRefreshMetadata) => {
+      if (!leadId) throw new Error('Missing lead id')
+      return refreshLeadById(leadId, metadata)
+    },
+    onSuccess: (lead) => {
+      if (leadId) {
+        queryClient.setQueryData(leadKeys.detail(leadId), lead)
+      }
+    },
+  })
+}
+
+export function useSendLeadEmail(leadId: string | undefined) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async () => {
+      if (!leadId) throw new Error('Missing lead id')
+      await sendLeadEmailById(leadId)
+    },
+    onSuccess: () => {
+      if (leadId) {
+        queryClient.invalidateQueries({ queryKey: leadKeys.detail(leadId) })
+      }
+    },
+  })
+}
+
+export function useLeadsApiMode() {
+  return hasApiBaseUrl()
 }
 
 export function usePipelineStages() {
