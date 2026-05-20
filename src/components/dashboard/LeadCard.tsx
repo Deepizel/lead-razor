@@ -42,7 +42,7 @@ export function LeadCard({ lead, onRescore }: LeadCardProps) {
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="default" size="sm" className="flex-1 sm:flex-none" asChild>
-            <Link to={`/leads/${lead.id}`}>View</Link>
+            <Link to={`/dashboard/leads/${lead.id}`}>View</Link>
           </Button>
           <Button
             variant="outline"

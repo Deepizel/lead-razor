@@ -1,14 +1,18 @@
 import { useState } from 'react'
+import { ApiStatusBanner } from '@/components/layout/ApiStatusBanner'
 import { CategoriesTable } from '@/components/categories/CategoriesTable'
 import { CategoryFormDialog } from '@/components/categories/CategoryFormDialog'
 import { DeleteCategoryDialog } from '@/components/categories/DeleteCategoryDialog'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import { ApiError } from '@/lib/api-client'
 import { useCategories } from '@/hooks/useCategories'
+import { useLeadsApiMode } from '@/hooks/useLeads'
 import type { Category } from '@/types/category'
 
 export default function CategoriesPage() {
+  const apiMode = useLeadsApiMode()
   const { data: categories, isLoading, isError, error } = useCategories()
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<Category | null>(null)
@@ -33,22 +37,25 @@ export default function CategoriesPage() {
             Define ICP segments — offering feeds the AI prompt; statement drives fit
             scoring
           </p>
-          <p className="mt-1 text-[0.625rem] text-muted-foreground">
-            Categories use local storage until{' '}
-            <code className="rounded bg-muted px-1">GET /api/categories</code> is available
-            (see API_REFERENCE.md).
-          </p>
         </div>
         <Button size="sm" className="w-full shrink-0 sm:w-auto" onClick={openCreate}>
           Add category
         </Button>
       </div>
 
+      <ApiStatusBanner />
+
       <Card>
         <CardHeader>
           <CardTitle>All categories</CardTitle>
         </CardHeader>
         <CardContent>
+          {!apiMode && (
+            <p className="text-sm text-muted-foreground">
+              Configure <code className="rounded bg-muted px-1">VITE_API_BASE_URL</code> to
+              manage categories via the API.
+            </p>
+          )}
           {isLoading && (
             <div className="space-y-2">
               {Array.from({ length: 4 }).map((_, i) => (
@@ -56,9 +63,18 @@ export default function CategoriesPage() {
               ))}
             </div>
           )}
-          {isError && (
+          {apiMode && isError && (
             <p className="text-sm text-destructive">
-              {error instanceof Error ? error.message : 'Failed to load categories.'}
+              {error instanceof ApiError
+                ? error.message
+                : error instanceof Error
+                  ? error.message
+                  : 'Failed to load categories.'}
+              {error instanceof ApiError && error.status === 404 && (
+                <span className="mt-1 block text-xs text-muted-foreground">
+                  GET /api/categories is not available on this backend yet.
+                </span>
+              )}
             </p>
           )}
           {categories && categories.length === 0 && (

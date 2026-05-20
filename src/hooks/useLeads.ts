@@ -2,10 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   fetchLeadById,
   fetchLeads,
-  fetchPipelineStages,
-  fetchROIMetrics,
   refreshLeadById,
   sendLeadEmailById,
+  uploadLeadsFile,
 } from '@/api/leads'
 import { hasApiBaseUrl } from '@/lib/api-client'
 import { useUiStore } from '@/stores/uiStore'
@@ -16,8 +15,6 @@ export const leadKeys = {
   list: (filters: ReturnType<typeof useUiStore.getState>['filters']) =>
     [...leadKeys.all, 'list', filters] as const,
   detail: (id: string) => [...leadKeys.all, 'detail', id] as const,
-  pipeline: ['pipeline'] as const,
-  roi: ['roi'] as const,
 }
 
 export function useLeads() {
@@ -25,18 +22,15 @@ export function useLeads() {
   return useQuery({
     queryKey: leadKeys.list(filters),
     queryFn: () => fetchLeads(filters),
+    enabled: hasApiBaseUrl(),
   })
 }
 
 export function useLead(id: string | undefined) {
   return useQuery({
     queryKey: leadKeys.detail(id ?? ''),
-    queryFn: async () => {
-      const lead = await fetchLeadById(id!)
-      if (!lead) throw new Error('Lead not found')
-      return lead
-    },
-    enabled: Boolean(id),
+    queryFn: () => fetchLeadById(id!),
+    enabled: Boolean(id) && hasApiBaseUrl(),
   })
 }
 
@@ -50,6 +44,7 @@ export function useRefreshLeadSnapshot(leadId: string | undefined) {
     onSuccess: (lead) => {
       if (leadId) {
         queryClient.setQueryData(leadKeys.detail(leadId), lead)
+        queryClient.invalidateQueries({ queryKey: leadKeys.all })
       }
     },
   })
@@ -65,25 +60,22 @@ export function useSendLeadEmail(leadId: string | undefined) {
     onSuccess: () => {
       if (leadId) {
         queryClient.invalidateQueries({ queryKey: leadKeys.detail(leadId) })
+        queryClient.invalidateQueries({ queryKey: leadKeys.all })
       }
+    },
+  })
+}
+
+export function useUploadLeads() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: { file: File; categoryId: string }) => uploadLeadsFile(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: leadKeys.all })
     },
   })
 }
 
 export function useLeadsApiMode() {
   return hasApiBaseUrl()
-}
-
-export function usePipelineStages() {
-  return useQuery({
-    queryKey: leadKeys.pipeline,
-    queryFn: fetchPipelineStages,
-  })
-}
-
-export function useROIMetrics() {
-  return useQuery({
-    queryKey: leadKeys.roi,
-    queryFn: fetchROIMetrics,
-  })
 }

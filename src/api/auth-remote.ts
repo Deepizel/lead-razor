@@ -1,0 +1,120 @@
+import { apiPaths } from '@/api/paths'
+import { apiRequest } from '@/lib/api-client'
+import { useAuthStore } from '@/stores/authStore'
+import type {
+  AuthMessageResponse,
+  AuthSession,
+  AuthUser,
+  ForgotPasswordRequest,
+  LoginRequest,
+  RefreshRequest,
+  ResetPasswordRequest,
+  SignupRequest,
+} from '@/types/auth'
+
+const ACCESS_TTL_MS = 5 * 60 * 1000
+
+interface RawAuthPayload {
+  accessToken?: string
+  access_token?: string
+  refreshToken?: string
+  refresh_token?: string
+  user?: RawUser
+}
+
+interface RawUser {
+  id: string
+  email: string
+  emailVerified?: boolean
+  email_verified?: boolean
+}
+
+function mapUser(raw: RawUser): AuthUser {
+  return {
+    id: raw.id,
+    email: raw.email,
+    emailVerified: Boolean(raw.emailVerified ?? raw.email_verified),
+  }
+}
+
+function mapSession(raw: RawAuthPayload, user: AuthUser): AuthSession {
+  const accessToken = raw.accessToken ?? raw.access_token
+  const refreshToken = raw.refreshToken ?? raw.refresh_token
+  if (!accessToken || !refreshToken) {
+    throw new Error('Invalid auth response from server')
+  }
+  return {
+    accessToken,
+    refreshToken,
+    accessTokenExpiresAt: Date.now() + ACCESS_TTL_MS,
+    user,
+  }
+}
+
+function mapAuthResponse(raw: RawAuthPayload & { user?: RawUser }): AuthSession {
+  const user = raw.user
+    ? mapUser(raw.user)
+    : { id: '', email: '', emailVerified: false }
+  return mapSession(raw, user)
+}
+
+export async function signup(body: SignupRequest): Promise<AuthMessageResponse> {
+  return apiRequest<AuthMessageResponse>(apiPaths.auth.signup, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    skipAuth: true,
+    silentError: true,
+  })
+}
+
+export async function login(body: LoginRequest): Promise<AuthSession> {
+  const raw = await apiRequest<RawAuthPayload & { user: RawUser }>(apiPaths.auth.login, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    skipAuth: true,
+    silentError: true,
+  })
+  return mapAuthResponse(raw)
+}
+
+export async function refreshSession(body: RefreshRequest): Promise<AuthSession> {
+  const raw = await apiRequest<RawAuthPayload & { user?: RawUser }>(apiPaths.auth.refresh, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    skipAuth: true,
+    silentError: true,
+  })
+  const existingUser = useAuthStore.getState().user
+  const user = raw.user ? mapUser(raw.user) : existingUser ?? { id: '', email: '', emailVerified: false }
+  return mapSession(raw, user)
+}
+
+export async function fetchMe(): Promise<AuthUser> {
+  const raw = await apiRequest<RawUser>(apiPaths.auth.me)
+  return mapUser(raw)
+}
+
+export async function forgotPassword(body: ForgotPasswordRequest): Promise<AuthMessageResponse> {
+  return apiRequest<AuthMessageResponse>(apiPaths.auth.forgotPassword, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    skipAuth: true,
+    silentError: true,
+  })
+}
+
+export async function resetPassword(body: ResetPasswordRequest): Promise<AuthMessageResponse> {
+  return apiRequest<AuthMessageResponse>(apiPaths.auth.resetPassword, {
+    method: 'POST',
+    body: JSON.stringify(body),
+    skipAuth: true,
+    silentError: true,
+  })
+}
+
+export async function verifyEmail(token: string): Promise<AuthMessageResponse> {
+  return apiRequest<AuthMessageResponse>(
+    `${apiPaths.auth.verifyEmail}?token=${encodeURIComponent(token)}`,
+    { skipAuth: true, silentError: true },
+  )
+}

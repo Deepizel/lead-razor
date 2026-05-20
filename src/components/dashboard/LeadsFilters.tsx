@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { leadSources } from '@/data/mockLeads'
+import { useLeads } from '@/hooks/useLeads'
+import { deriveLeadSourceOptions } from '@/lib/derive-lead-sources'
 import { getUploadedDateRange } from '@/lib/lead-utils'
 import { useUiStore } from '@/stores/uiStore'
 import type { LeadStatus, UploadedDatePreset } from '@/types/lead'
@@ -32,6 +34,9 @@ export function LeadsFilters() {
   const filters = useUiStore((s) => s.filters)
   const setFilters = useUiStore((s) => s.setFilters)
   const resetFilters = useUiStore((s) => s.resetFilters)
+  const { data: leads } = useLeads()
+
+  const leadSources = useMemo(() => deriveLeadSourceOptions(leads), [leads])
 
   const showCustomDates = filters.uploadedPreset === 'custom'
 

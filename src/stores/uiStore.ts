@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { SOURCE_FILTER_ALL } from '@/constants/filters'
 import type { LeadFilters } from '@/types/lead'
 
 interface UiState {
@@ -18,7 +19,7 @@ const defaultFilters: LeadFilters = {
   status: 'all',
   minScore: 0,
   maxScore: 100,
-  source: 'All',
+  source: SOURCE_FILTER_ALL,
   uploadedPreset: 'all',
   uploadedFrom: '',
   uploadedTo: '',

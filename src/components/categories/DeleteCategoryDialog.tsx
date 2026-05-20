@@ -42,7 +42,7 @@ export function DeleteCategoryDialog({
           <AlertDialogDescription>
             This will permanently remove{' '}
             <span className="font-medium text-foreground">{category?.name}</span>.
-            Leads already scored under this category are not affected in this mock
+            Leads already scored under this category are not affected
             setup.
           </AlertDialogDescription>
         </AlertDialogHeader>

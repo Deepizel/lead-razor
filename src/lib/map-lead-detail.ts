@@ -31,12 +31,13 @@ export function mapLeadDetailToUi(
     riskFlags: snapshot
       ? []
       : ['Snapshot missing — email send and full reasoning unavailable'],
-    draftEmail: snapshot?.suggestedEmail
-      ? formatDraftEmail(snapshot.suggestedEmail.subject, snapshot.suggestedEmail.body)
-      : '',
-    emailSubject: snapshot?.suggestedEmail.subject ?? '',
-    emailBody: snapshot?.suggestedEmail.body ?? '',
-    emailSentAt: snapshot?.suggestedEmail.sentAt ?? null,
+    draftEmail:
+      snapshot?.suggestedEmail?.subject && snapshot?.suggestedEmail?.body
+        ? formatDraftEmail(snapshot.suggestedEmail.subject, snapshot.suggestedEmail.body)
+        : '',
+    emailSubject: snapshot?.suggestedEmail?.subject ?? '',
+    emailBody: snapshot?.suggestedEmail?.body ?? '',
+    emailSentAt: snapshot?.suggestedEmail?.sentAt ?? null,
     hasSnapshot: Boolean(snapshot),
     emailsSent: lead.emails_sent,
   }

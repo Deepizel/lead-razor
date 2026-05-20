@@ -64,3 +64,6 @@ export interface SendEmailResponse {
 export interface ApiErrorBody {
   error: string
 }
+
+/** GET /api/leads — array or wrapped list depending on backend version */
+export type LeadsListResponse = ApiLead[] | { leads: ApiLead[] }

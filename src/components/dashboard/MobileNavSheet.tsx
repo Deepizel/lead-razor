@@ -26,7 +26,7 @@ export function MobileNavSheet() {
           <DashboardNav onNavigate={() => setNavOpen(false)} />
         </div>
         <p className="border-t border-border p-4 text-[0.625rem] text-muted-foreground">
-          AI SDR co-pilot · mock data
+          AI SDR co-pilot
         </p>
       </SheetContent>
     </Sheet>

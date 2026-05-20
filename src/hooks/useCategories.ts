@@ -5,6 +5,7 @@ import {
   fetchCategories,
   updateCategory,
 } from '@/api/categories'
+import { hasApiBaseUrl } from '@/lib/api-client'
 import type { CategoryInput } from '@/types/category'
 
 export const categoryKeys = {
@@ -16,6 +17,7 @@ export function useCategories() {
   return useQuery({
     queryKey: categoryKeys.list(),
     queryFn: fetchCategories,
+    enabled: hasApiBaseUrl(),
   })
 }
 
