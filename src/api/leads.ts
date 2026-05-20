@@ -5,7 +5,7 @@ import {
   sendLeadEmail,
   uploadLeadsFile,
 } from '@/api/leads-remote'
-import { ApiError } from '@/lib/api-client'
+// import { ApiError } from '@/lib/api-client'
 import { mapLeadDetailResponse } from '@/lib/map-lead-detail'
 import {
   applyLeadFilters,
