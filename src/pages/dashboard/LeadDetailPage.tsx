@@ -56,18 +56,15 @@ export default function LeadDetailPage() {
     return (
       <div className="space-y-4">
         <Button variant="ghost" size="sm" asChild>
-          <Link to="/">← Back to leads</Link>
+          <Link to="/dashboard">← Back to leads</Link>
         </Button>
         <p className="text-sm text-destructive">
           {error instanceof Error ? error.message : 'Lead not found.'}
         </p>
-        {apiMode && (
-          <p className="text-xs text-muted-foreground">
-            Use a lead UUID from your database in the URL (mock IDs like{' '}
-            <code className="rounded bg-muted px-1">lead-001</code> only work without the
-            API).
-          </p>
-        )}
+        <p className="text-xs text-muted-foreground">
+          Use a lead UUID from your database in the URL (e.g. from an upload or{' '}
+          <code className="rounded bg-muted px-1">GET /api/leads</code>).
+        </p>
       </div>
     )
   }
@@ -77,13 +74,11 @@ export default function LeadDetailPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <Button variant="ghost" size="sm" asChild className="mb-2 -ml-2">
-            <Link to="/">← Back to leads</Link>
+            <Link to="/dashboard">← Back to leads</Link>
           </Button>
           <h1 className="text-lg font-semibold tracking-tight">Lead detail</h1>
           <p className="text-xs text-muted-foreground">
-            {apiMode
-              ? 'Live API — snapshot profiling and Resend email'
-              : 'AI reasoning and recommended actions (mock)'}
+            Snapshot profiling and Resend email via API
           </p>
         </div>
         <Button

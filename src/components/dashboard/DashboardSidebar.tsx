@@ -13,7 +13,7 @@ export function DashboardSidebar() {
       <DashboardNav className="flex-1 p-3" />
 
       <div className="border-t border-sidebar-border p-4 text-[0.625rem] text-muted-foreground">
-        AI SDR co-pilot · mock data
+        AI SDR co-pilot
       </div>
     </aside>
   )

@@ -75,7 +75,7 @@ export function LeadTable({ leads, onRescore }: LeadTableProps) {
                 <TableCell className="sticky right-0 z-10 bg-card text-right">
                   <div className="flex justify-end gap-1">
                     <Button variant="ghost" size="xs" asChild>
-                      <Link to={`/leads/${lead.id}`}>View</Link>
+                      <Link to={`/dashboard/leads/${lead.id}`}>View</Link>
                     </Button>
                     <Button
                       variant="outline"

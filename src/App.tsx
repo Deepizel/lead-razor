@@ -1,11 +1,11 @@
 import AppRouter from '@/Routes'
-import { QueryProvider } from '@/providers/QueryProvider'
+import { AppProviders } from '@/providers/AppProviders'
 
 function App() {
   return (
-    <QueryProvider>
+    <AppProviders>
       <AppRouter />
-    </QueryProvider>
+    </AppProviders>
   )
 }
 

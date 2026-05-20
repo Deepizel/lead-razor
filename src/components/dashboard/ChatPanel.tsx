@@ -24,29 +24,15 @@ const starterMessages: Message[] = [
     id: '1',
     role: 'assistant',
     content:
-      'I’m your AI SDR co-pilot. Ask about any lead, scoring logic, or how to prioritize your pipeline today.',
+      'Agent chat is not connected to a backend yet. When an agent API is available, you can ask about leads, scoring, and pipeline priorities here.',
   },
 ]
 
 const suggestions = [
   'Why is this lead cold?',
   'How can I convert this lead?',
-  'Summarize all hot leads',
+  'Summarize hot leads',
 ]
-
-function mockReply(input: string): string {
-  const lower = input.toLowerCase()
-  if (lower.includes('cold')) {
-    return 'This lead is cold because engagement dropped after the webinar, no decision-maker is on the thread, and the account sits outside your core ICP. Consider a nurture sequence focused on RevOps pain points.'
-  }
-  if (lower.includes('convert')) {
-    return 'To convert: reference their intent signals in the opener, offer a 15-minute fit check with RevOps, and attach a vertical-specific ROI snapshot. The drafted email is a strong starting point — personalize the first line.'
-  }
-  if (lower.includes('hot') || lower.includes('summarize')) {
-    return 'You have 2 hot leads: Sarah Chen (92) at NovaStack AI and James Okonkwo (88) at Vertex Payments. Both show budget timing and strong ICP fit. Prioritize scheduling with James (meeting already booked) and send Sarah the enterprise ROI doc.'
-  }
-  return 'Based on current pipeline data, I recommend focusing on hot leads with scheduled meetings first, then warming Marcus Webb with case studies. I can draft actions for any lead you name.'
-}
 
 export function ChatPanel() {
   const chatOpen = useUiStore((s) => s.chatOpen)
@@ -61,7 +47,8 @@ export function ChatPanel() {
     const assistantMsg: Message = {
       id: crypto.randomUUID(),
       role: 'assistant',
-      content: mockReply(text),
+      content:
+        'Agent responses require a chat API endpoint. Use lead detail pages for snapshot reasoning and email actions in the meantime.',
     }
     setMessages((prev) => [...prev, userMsg, assistantMsg])
     setInput('')

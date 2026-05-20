@@ -1,10 +1,14 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import ProtectedRoutes from '@/core/guards/ProtectedRoutes'
+import GuestOnlyRoute from '@/core/guards/GuestOnlyRoute'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
 import { Skeleton } from '@/components/ui/skeleton'
+import { DASHBOARD_BASE } from '@/constants/routes'
 
-// const Home = lazy(() => import('@/pages/landing/Home'))
-// const Auth = lazy(() => import('@/pages/auth/Auth'))
+const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
+const VerifyEmailPage = lazy(() => import('@/pages/auth/VerifyEmailPage'))
+const ResetPasswordPage = lazy(() => import('@/pages/auth/ResetPasswordPage'))
 
 const LeadsDashboard = lazy(() => import('@/pages/dashboard/LeadsDashboard'))
 const LeadDetailPage = lazy(() => import('@/pages/dashboard/LeadDetailPage'))
@@ -28,17 +32,20 @@ export default function AppRouter() {
     <BrowserRouter>
       <Suspense fallback={<PageLoader />}>
         <Routes>
-          {/* Marketing / auth — enable when ready
-          <Route path="/landing" element={<Home />} />
-          <Route path="/auth" element={<Auth />} />
-          */}
+          <Route element={<GuestOnlyRoute />}>
+            <Route index element={<LoginPage />} />
+            <Route path="verify-email" element={<VerifyEmailPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
+          </Route>
 
-          <Route element={<DashboardLayout />}>
-            <Route index element={<LeadsDashboard />} />
-            <Route path="leads/:id" element={<LeadDetailPage />} />
-            <Route path="categories" element={<CategoriesPage />} />
-            <Route path="analytics/pipeline" element={<PipelineAnalyticsPage />} />
-            <Route path="analytics/roi" element={<ROIDashboardPage />} />
+          <Route element={<ProtectedRoutes />}>
+            <Route path={DASHBOARD_BASE} element={<DashboardLayout />}>
+              <Route index element={<LeadsDashboard />} />
+              <Route path="leads/:id" element={<LeadDetailPage />} />
+              <Route path="categories" element={<CategoriesPage />} />
+              <Route path="analytics/pipeline" element={<PipelineAnalyticsPage />} />
+              <Route path="analytics/roi" element={<ROIDashboardPage />} />
+            </Route>
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

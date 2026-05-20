@@ -2,13 +2,18 @@ import { Outlet } from 'react-router-dom'
 import { ChatPanel } from '@/components/dashboard/ChatPanel'
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar'
 import { MobileNavSheet } from '@/components/dashboard/MobileNavSheet'
+import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { useLogout } from '@/hooks/useAuth'
+import { useAuthStore } from '@/stores/authStore'
 import { useUiStore } from '@/stores/uiStore'
 
 export function DashboardLayout() {
   const toggleChat = useUiStore((s) => s.toggleChat)
   const setNavOpen = useUiStore((s) => s.setNavOpen)
+  const user = useAuthStore((s) => s.user)
+  const logout = useLogout()
 
   return (
     <div className="flex min-h-svh bg-background">
@@ -36,15 +41,21 @@ export function DashboardLayout() {
             </p>
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="shrink-0"
-            onClick={toggleChat}
-          >
-            <span className="hidden sm:inline">Open agent chat</span>
-            <span className="sm:hidden">Chat</span>
-          </Button>
+          <div className="flex shrink-0 items-center gap-2">
+            {user?.email && (
+              <span className="hidden max-w-[140px] truncate text-xs text-muted-foreground md:inline">
+                {user.email}
+              </span>
+            )}
+            <ThemeToggle />
+            <Button variant="outline" size="sm" onClick={toggleChat}>
+              <span className="hidden sm:inline">Open agent chat</span>
+              <span className="sm:hidden">Chat</span>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={logout}>
+              Sign out
+            </Button>
+          </div>
         </header>
         <Separator className="hidden sm:block" />
         <main className="flex-1 overflow-auto p-4 pb-20 sm:p-5 sm:pb-5 md:p-6 md:pb-6">

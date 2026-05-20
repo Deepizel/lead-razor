@@ -1,15 +1,18 @@
 import { useEffect } from 'react'
+import { ApiStatusBanner } from '@/components/layout/ApiStatusBanner'
 import { AddLeadMenu } from '@/components/dashboard/AddLeadMenu'
 import { LeadTable } from '@/components/dashboard/LeadTable'
 import { LeadsFilters } from '@/components/dashboard/LeadsFilters'
 import { MetricCards } from '@/components/dashboard/MetricCards'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useLeads } from '@/hooks/useLeads'
+import { ApiError } from '@/lib/api-client'
+import { useLeads, useLeadsApiMode } from '@/hooks/useLeads'
 import { useUiStore } from '@/stores/uiStore'
 
 export default function LeadsDashboard() {
-  const { data: leads, isLoading, isError } = useLeads()
+  const apiMode = useLeadsApiMode()
+  const { data: leads, isLoading, isError, error } = useLeads()
   const setSelectedLeadId = useUiStore((s) => s.setSelectedLeadId)
 
   useEffect(() => {
@@ -34,12 +37,14 @@ export default function LeadsDashboard() {
         <AddLeadMenu />
       </div>
 
+      <ApiStatusBanner />
+
       <MetricCards
         metrics={[
           { label: 'Total leads', value: String(leads?.length ?? '—') },
           { label: 'Hot leads', value: String(hotCount), hint: 'Score 80+' },
           { label: 'Avg score', value: String(avgScore) },
-          { label: 'Needs action', value: '3', hint: 'Mock — re-score queue' },
+          { label: 'Needs action', value: '—', hint: 'From API when available' },
         ]}
       />
 
@@ -57,8 +62,26 @@ export default function LeadsDashboard() {
               ))}
             </div>
           )}
-          {isError && (
-            <p className="text-sm text-destructive">Failed to load leads.</p>
+          {!apiMode && (
+            <p className="text-sm text-muted-foreground">
+              Configure <code className="rounded bg-muted px-1">VITE_API_BASE_URL</code> to
+              load leads from the API.
+            </p>
+          )}
+          {apiMode && isError && (
+            <p className="text-sm text-destructive">
+              {error instanceof ApiError
+                ? error.message
+                : error instanceof Error
+                  ? error.message
+                  : 'Failed to load leads.'}
+              {error instanceof ApiError && error.status === 404 && (
+                <span className="mt-1 block text-xs text-muted-foreground">
+                  GET /api/leads is not available on this backend yet — upload leads or
+                  open a lead by UUID from your database.
+                </span>
+              )}
+            </p>
           )}
           {leads && leads.length === 0 && (
             <p className="py-8 text-center text-sm text-muted-foreground">
