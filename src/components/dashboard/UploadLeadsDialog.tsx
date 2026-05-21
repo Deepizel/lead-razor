@@ -166,14 +166,13 @@ export function UploadLeadsDialog({ open, onOpenChange }: UploadLeadsDialogProps
                 onValueChange={setCategoryId}
                 disabled={upload.isPending}
               >
-                <SelectTrigger id="upload-category" className="w-full">
+                <SelectTrigger id="upload-category" className="w-full min-w-0">
                   <SelectValue placeholder="Select active category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      <span className="font-medium">{c.name}</span>
-                      <span className="ml-2 text-muted-foreground">— {c.offering}</span>
+                    <SelectItem key={c.id} value={c.id} className="truncate">
+                      {c.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
