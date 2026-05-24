@@ -19,8 +19,9 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCategories } from '@/hooks/useCategories'
-import { useExportReport, useReportsApiMode } from '@/hooks/useReports'
+import { useExportReport, useReportTiers, useReportsApiMode } from '@/hooks/useReports'
 import { ApiError } from '@/lib/api-client'
+import { formatReportTierLabel } from '@/lib/map-report-tiers'
 import { toDateInputValue } from '@/lib/lead-utils'
 import {
   REPORT_LIMIT_OPTIONS,
@@ -33,6 +34,7 @@ interface ReportExportDialogProps {
 }
 
 const ALL_CATEGORIES = 'all'
+const ALL_TIERS = 'all'
 
 function defaultDateRange() {
   const dateTo = new Date()
@@ -52,8 +54,15 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
     isLoading: categoriesLoading,
     refetch: refetchCategories,
   } = useCategories()
+  const {
+    data: tiers = [],
+    isLoading: tiersLoading,
+    isError: tiersError,
+    refetch: refetchTiers,
+  } = useReportTiers(open)
 
   const [categoryId, setCategoryId] = useState(ALL_CATEGORIES)
+  const [tierId, setTierId] = useState(ALL_TIERS)
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [limit, setLimit] = useState<ReportLimitValue>('20')
@@ -62,14 +71,16 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
   useEffect(() => {
     if (open) {
       void refetchCategories()
+      void refetchTiers()
       const range = defaultDateRange()
       setDateFrom(range.dateFrom)
       setDateTo(range.dateTo)
       setCategoryId(ALL_CATEGORIES)
+      setTierId(ALL_TIERS)
       setLimit('20')
       setError(null)
     }
-  }, [open, refetchCategories])
+  }, [open, refetchCategories, refetchTiers])
 
   const handleGenerate = async () => {
     setError(null)
@@ -86,6 +97,7 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
     try {
       await exportReport.mutateAsync({
         categoryId: categoryId === ALL_CATEGORIES ? null : categoryId,
+        tierId: tierId === ALL_TIERS ? null : tierId,
         dateFrom,
         dateTo,
         limit,
@@ -102,7 +114,9 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
     }
   }
 
-  const canGenerate = apiMode && !exportReport.isPending && Boolean(dateFrom && dateTo)
+  const filtersLoading = categoriesLoading || tiersLoading
+  const canGenerate =
+    apiMode && !exportReport.isPending && !filtersLoading && Boolean(dateFrom && dateTo)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -110,8 +124,8 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
         <DialogHeader>
           <DialogTitle>Generate leads report</DialogTitle>
           <DialogDescription>
-            Filter by category and date range, then download an Excel report with scores,
-            engagement, and AI summaries.
+            Filter by category, tier, and date range, then download an Excel report with
+            scores, engagement, and AI summaries.
           </DialogDescription>
         </DialogHeader>
 
@@ -124,7 +138,7 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
               <Select
                 value={categoryId}
                 onValueChange={setCategoryId}
-                disabled={exportReport.isPending}
+                disabled={exportReport.isPending || filtersLoading}
               >
                 <SelectTrigger id="report-category" className="w-full">
                   <SelectValue placeholder="All categories" />
@@ -138,6 +152,36 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
                   ))}
                 </SelectContent>
               </Select>
+            )}
+          </div>
+
+          <div className="grid gap-1.5">
+            <Label htmlFor="report-tier">Tier</Label>
+            {tiersLoading ? (
+              <Skeleton className="h-9 w-full" />
+            ) : (
+              <Select
+                value={tierId}
+                onValueChange={setTierId}
+                disabled={exportReport.isPending || filtersLoading || tiersError}
+              >
+                <SelectTrigger id="report-tier" className="w-full">
+                  <SelectValue placeholder="All tiers" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ALL_TIERS}>All tiers</SelectItem>
+                  {tiers.map((tier) => (
+                    <SelectItem key={tier.id} value={tier.id}>
+                      {formatReportTierLabel(tier)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {tiersError && (
+              <p className="text-xs text-destructive">
+                Could not load tier definitions. Check the API and try again.
+              </p>
             )}
           </div>
 
@@ -214,7 +258,11 @@ export function ReportExportDialog({ open, onOpenChange }: ReportExportDialogPro
             disabled={!canGenerate}
             onClick={() => void handleGenerate()}
           >
-            {exportReport.isPending ? 'Generating…' : 'Generate report'}
+            {exportReport.isPending
+              ? 'Generating…'
+              : filtersLoading
+                ? 'Loading filters…'
+                : 'Generate report'}
           </Button>
         </DialogFooter>
       </DialogContent>

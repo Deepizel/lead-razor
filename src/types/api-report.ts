@@ -1,6 +1,19 @@
+/** GET /api/reports/tiers — tier definition for report filters */
+export interface ReportTierDefinition {
+  id: string
+  label: string
+  min_score: number
+  max_score: number | null
+}
+
+export type ReportTiersResponse =
+  | ReportTierDefinition[]
+  | { tiers: ReportTierDefinition[] }
+
 /** GET /api/reports/export query params */
 export interface ExportReportParams {
   categoryId?: string | null
+  tierId?: string | null
   dateFrom: string
   dateTo: string
   /** Row cap: 10, 20, 50, 100, or "all" */

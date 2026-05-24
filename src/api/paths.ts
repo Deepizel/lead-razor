@@ -54,6 +54,7 @@ export const apiPaths = {
     pipeline: '/api/analytics/pipeline',
   },
   reports: {
+    tiers: '/api/reports/tiers',
     export: '/api/reports/export',
   },
 } as const

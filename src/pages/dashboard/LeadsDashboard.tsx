@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { ApiStatusBanner } from '@/components/layout/ApiStatusBanner'
 import { AddLeadMenu } from '@/components/dashboard/AddLeadMenu'
-import { ReportsMenu } from '@/components/dashboard/ReportsMenu'
 import { LeadTable } from '@/components/dashboard/LeadTable'
 import { LeadsFilters } from '@/components/dashboard/LeadsFilters'
 import { MetricCards } from '@/components/dashboard/MetricCards'
@@ -36,8 +35,7 @@ export default function LeadsDashboard() {
           </p>
         </div>
         <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto">
-          <ReportsMenu />
-          <AddLeadMenu />
+        <AddLeadMenu />
         </div>
       </div>
 
