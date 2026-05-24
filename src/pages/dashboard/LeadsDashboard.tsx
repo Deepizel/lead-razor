@@ -34,7 +34,9 @@ export default function LeadsDashboard() {
             AI-scored pipeline — filter, review, and act on incoming leads
           </p>
         </div>
+        <div className="flex w-full shrink-0 flex-wrap gap-2 sm:w-auto">
         <AddLeadMenu />
+        </div>
       </div>
 
       <ApiStatusBanner />

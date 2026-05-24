@@ -1,11 +1,14 @@
+import { sendLeadEmail } from '@/api/emails'
 import {
+  createLeadRemote,
+  downloadLeadUploadTemplateRemote,
+  exportLeadsRemote,
   fetchLeadDetail,
+  fetchLeadScoreBreakdownRemote,
   fetchLeadsListRemote,
   refreshLeadSnapshot,
-  sendLeadEmail,
   uploadLeadsFile,
 } from '@/api/leads-remote'
-// import { ApiError } from '@/lib/api-client'
 import { mapLeadDetailResponse } from '@/lib/map-lead-detail'
 import {
   applyLeadFilters,
@@ -14,7 +17,11 @@ import {
 } from '@/lib/map-lead-list'
 import { assertApiConfigured } from '@/lib/require-api'
 import type { Lead, LeadFilters } from '@/types/lead'
-import type { LeadDetailResponse, SnapshotRefreshMetadata } from '@/types/api-lead'
+import type {
+  CreateLeadRequest,
+  LeadDetailResponse,
+  SnapshotRefreshMetadata,
+} from '@/types/api-lead'
 
 export async function fetchLeads(filters?: LeadFilters): Promise<Lead[]> {
   assertApiConfigured()
@@ -41,6 +48,11 @@ export async function fetchLeadById(id: string): Promise<Lead> {
   return mapLeadDetailResponse(data)
 }
 
+export async function fetchLeadScoreBreakdown(id: string) {
+  assertApiConfigured()
+  return fetchLeadScoreBreakdownRemote(id)
+}
+
 export async function refreshLeadById(
   id: string,
   metadata?: SnapshotRefreshMetadata,
@@ -50,10 +62,30 @@ export async function refreshLeadById(
   return mapLeadDetailResponse(data)
 }
 
-export async function sendLeadEmailById(id: string): Promise<void> {
+export type { SendLeadEmailOptions } from '@/api/emails'
+
+export async function sendLeadEmailById(
+  id: string,
+  options?: import('@/api/emails').SendLeadEmailOptions,
+): Promise<void> {
   assertApiConfigured()
-  await sendLeadEmail(id)
+  await sendLeadEmail(id, options)
+}
+
+export async function createLead(payload: CreateLeadRequest) {
+  assertApiConfigured()
+  return createLeadRemote(payload)
+}
+
+export async function downloadLeadUploadTemplate() {
+  assertApiConfigured()
+  return downloadLeadUploadTemplateRemote()
+}
+
+export async function exportLeadsSpreadsheet() {
+  assertApiConfigured()
+  return exportLeadsRemote()
 }
 
 export { uploadLeadsFile }
-export type { LeadDetailResponse }
+export type { CreateLeadRequest, LeadDetailResponse }

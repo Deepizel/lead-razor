@@ -1,5 +1,10 @@
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { LeadCard } from '@/components/dashboard/LeadCard'
+import {
+  LeadTablePagination,
+  type LeadPageSize,
+} from '@/components/dashboard/LeadTablePagination'
 import { ScoreBadge } from '@/components/dashboard/ScoreBadge'
 import { StatusChip } from '@/components/dashboard/StatusChip'
 import { Button } from '@/components/ui/button'
@@ -20,11 +25,34 @@ interface LeadTableProps {
 }
 
 export function LeadTable({ leads, onRescore }: LeadTableProps) {
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState<LeadPageSize>(10)
+
+  const totalPages = Math.max(1, Math.ceil(leads.length / pageSize))
+
+  useEffect(() => {
+    setPage(1)
+  }, [leads])
+
+  useEffect(() => {
+    setPage((current) => Math.min(current, totalPages))
+  }, [totalPages])
+
+  const paginatedLeads = useMemo(() => {
+    const start = (page - 1) * pageSize
+    return leads.slice(start, start + pageSize)
+  }, [leads, page, pageSize])
+
+  const handlePageSizeChange = (size: LeadPageSize) => {
+    setPageSize(size)
+    setPage(1)
+  }
+
   return (
-    <>
+    <div className="space-y-4">
       {/* Mobile: card list */}
       <ul className="flex flex-col gap-3 md:hidden">
-        {leads.map((lead) => (
+        {paginatedLeads.map((lead) => (
           <li key={lead.id}>
             <LeadCard lead={lead} onRescore={onRescore} />
           </li>
@@ -50,7 +78,7 @@ export function LeadTable({ leads, onRescore }: LeadTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {leads.map((lead) => (
+            {paginatedLeads.map((lead) => (
               <TableRow key={lead.id}>
                 <TableCell className="sticky left-0 z-10 bg-card font-medium">
                   {lead.name}
@@ -94,6 +122,14 @@ export function LeadTable({ leads, onRescore }: LeadTableProps) {
           </TableBody>
         </Table>
       </div>
-    </>
+
+      <LeadTablePagination
+        page={page}
+        pageSize={pageSize}
+        totalItems={leads.length}
+        onPageChange={setPage}
+        onPageSizeChange={handlePageSizeChange}
+      />
+    </div>
   )
 }

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CreateLeadDialog } from '@/components/dashboard/CreateLeadDialog'
 import { UploadLeadsDialog } from '@/components/dashboard/UploadLeadsDialog'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,33 +13,46 @@ import { ArrowDown01Icon } from '@hugeicons/core-free-icons'
 
 export function AddLeadMenu() {
   const [uploadOpen, setUploadOpen] = useState(false)
-
-  const handleImport = () => {
-    console.info('Import leads — not yet wired to API')
-  }
+  const [createOpen, setCreateOpen] = useState(false)
 
   return (
     <>
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button size="sm" className="w-full shrink-0 sm:w-auto">
-          Add new
-          <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} data-icon="inline-end" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-[140px]">
-        <DropdownMenuItem
-          onSelect={(e) => {
-            e.preventDefault()
-            setUploadOpen(true)
-          }}
-        >
-          Upload
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={handleImport}>Import</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-    <UploadLeadsDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button size="sm" className="w-full shrink-0 sm:w-auto">
+            Add new
+            <HugeiconsIcon icon={ArrowDown01Icon} strokeWidth={2} data-icon="inline-end" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-[168px]">
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault()
+              window.alert('Coming soon')
+            }}
+          >
+            Import
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault()
+              setUploadOpen(true)
+            }}
+          >
+            Upload spreadsheet
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={(e) => {
+              e.preventDefault()
+              setCreateOpen(true)
+            }}
+          >
+            Add lead details
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <UploadLeadsDialog open={uploadOpen} onOpenChange={setUploadOpen} />
+      <CreateLeadDialog open={createOpen} onOpenChange={setCreateOpen} />
     </>
   )
 }

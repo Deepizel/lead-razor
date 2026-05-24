@@ -1,3 +1,5 @@
+import { Download01Icon } from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
@@ -19,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCategories } from '@/hooks/useCategories'
-import { useLeadsApiMode, useUploadLeads } from '@/hooks/useLeads'
+import { useDownloadLeadTemplate, useLeadsApiMode, useUploadLeads } from '@/hooks/useLeads'
 import { ApiError } from '@/lib/api-client'
 import { notify } from '@/stores/toastStore'
 import { cn } from '@/lib/utils'
@@ -48,6 +50,7 @@ function resetFormState(
 export function UploadLeadsDialog({ open, onOpenChange }: UploadLeadsDialogProps) {
   const apiMode = useLeadsApiMode()
   const upload = useUploadLeads()
+  const downloadTemplate = useDownloadLeadTemplate()
   const {
     data: categories = [],
     isLoading: categoriesLoading,
@@ -140,6 +143,25 @@ export function UploadLeadsDialog({ open, onOpenChange }: UploadLeadsDialogProps
         </DialogHeader>
 
         <div className="grid gap-4 py-2">
+          <div className="rounded-lg border border-border/60 bg-muted/15 p-3">
+            <p className="text-xs font-medium text-foreground">Need the template?</p>
+            <p className="mt-1 text-[0.625rem] text-muted-foreground">
+              Download the latest Excel template with the correct columns, fill it in, then
+              upload below.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-3 gap-1.5"
+              disabled={!apiMode || downloadTemplate.isPending}
+              onClick={() => void downloadTemplate.mutateAsync()}
+            >
+              <HugeiconsIcon icon={Download01Icon} strokeWidth={2} className="size-3.5" />
+              {downloadTemplate.isPending ? 'Downloading…' : 'Download template (.xlsx)'}
+            </Button>
+          </div>
+
           <div className="grid gap-1.5">
             <Label htmlFor="upload-category">
               Category <span className="text-destructive">*</span>

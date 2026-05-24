@@ -1,9 +1,14 @@
 import { apiPaths } from '@/api/paths'
 import { apiRequest } from '@/lib/api-client'
+import { normalizeLeadScoreBreakdown } from '@/lib/map-lead-score'
+import { mapCreateLeadRequest } from '@/lib/map-create-lead'
+import { downloadApiFile } from '@/lib/download-api-file'
 import type {
+  CreateLeadRequest,
+  CreateLeadResponse,
   LeadDetailResponse,
+  LeadScoreBreakdownResponse,
   LeadsListResponse,
-  SendEmailResponse,
   SnapshotRefreshMetadata,
 } from '@/types/api-lead'
 
@@ -27,6 +32,13 @@ export async function fetchLeadDetail(id: string): Promise<LeadDetailResponse> {
   return apiRequest<LeadDetailResponse>(apiPaths.leads.detail(id))
 }
 
+export async function fetchLeadScoreBreakdownRemote(id: string) {
+  const raw = await apiRequest<LeadScoreBreakdownResponse>(apiPaths.leads.score(id), {
+    silentError: true,
+  })
+  return normalizeLeadScoreBreakdown(raw)
+}
+
 export async function refreshLeadSnapshot(
   id: string,
   metadata?: SnapshotRefreshMetadata,
@@ -38,11 +50,21 @@ export async function refreshLeadSnapshot(
   })
 }
 
-export async function sendLeadEmail(id: string): Promise<SendEmailResponse> {
-  return apiRequest<SendEmailResponse>(apiPaths.leads.sendEmail(id), {
+export async function createLeadRemote(
+  payload: CreateLeadRequest,
+): Promise<CreateLeadResponse> {
+  return apiRequest<CreateLeadResponse>(apiPaths.leads.create, {
     method: 'POST',
-    timeoutMs: 60_000,
+    body: JSON.stringify(mapCreateLeadRequest(payload)),
   })
+}
+
+export async function downloadLeadUploadTemplateRemote(): Promise<void> {
+  return downloadApiFile(apiPaths.leads.uploadTemplate, 'lead-upload-template.xlsx')
+}
+
+export async function exportLeadsRemote(): Promise<void> {
+  return downloadApiFile(apiPaths.leads.export, 'leads-export.xlsx')
 }
 
 export interface UploadLeadsPayload {
