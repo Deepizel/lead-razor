@@ -26,16 +26,26 @@ async function parseDownloadError(response: Response): Promise<string> {
 export async function downloadApiFile(
   path: string,
   fallbackFilename: string,
+  query?: Record<string, string | null | undefined>,
 ): Promise<void> {
   if (!apiBaseUrl) {
     throw new Error('VITE_API_BASE_URL is not configured')
   }
 
+  const qs = new URLSearchParams()
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value != null && value !== '') qs.set(key, value)
+    }
+  }
+  const queryString = qs.toString()
+  const requestUrl = `${apiBaseUrl}${path}${queryString ? `?${queryString}` : ''}`
+
   const headers = new Headers()
   const token = getAccessToken()
   if (token) headers.set('Authorization', `Bearer ${token}`)
 
-  const response = await fetch(`${apiBaseUrl}${path}`, { method: 'GET', headers })
+  const response = await fetch(requestUrl, { method: 'GET', headers })
 
   if (!response.ok) {
     const message = await parseDownloadError(response)
@@ -48,13 +58,13 @@ export async function downloadApiFile(
     fallbackFilename,
   )
 
-  const url = URL.createObjectURL(blob)
+  const blobUrl = URL.createObjectURL(blob)
   const anchor = document.createElement('a')
-  anchor.href = url
+  anchor.href = blobUrl
   anchor.download = filename
   anchor.rel = 'noopener'
   document.body.appendChild(anchor)
   anchor.click()
   anchor.remove()
-  URL.revokeObjectURL(url)
+  URL.revokeObjectURL(blobUrl)
 }
