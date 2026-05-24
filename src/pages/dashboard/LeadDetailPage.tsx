@@ -1,6 +1,10 @@
 import { useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ActionButtonGroup } from '@/components/dashboard/ActionButtonGroup'
+import {
+  ActionButtonGroup,
+  type SendEmailPayload,
+} from '@/components/dashboard/ActionButtonGroup'
+import { LeadEmailTimeline } from '@/components/lead/LeadEmailTimeline'
 import { LeadProfilePanel } from '@/components/dashboard/LeadProfilePanel'
 import { ReasoningPanel } from '@/components/dashboard/ReasoningPanel'
 import { Button } from '@/components/ui/button'
@@ -35,7 +39,7 @@ export default function LeadDetailPage() {
 
   const sendHint = apiMode
     ? lead?.hasSnapshot
-      ? 'Sends the snapshot email via Resend. Refresh snapshot first if content is empty.'
+      ? 'Send the AI snapshot as-is, or edit subject/body for a custom message.'
       : 'Refresh snapshot before sending.'
     : undefined
 
@@ -108,12 +112,14 @@ export default function LeadDetailPage() {
         <ReasoningPanel lead={lead} />
         <ActionButtonGroup
           lead={lead}
-          onSendEmail={() => sendEmail.mutate()}
+          onSendEmail={(payload: SendEmailPayload) => sendEmail.mutate(payload)}
           isSending={sendEmail.isPending}
           sendDisabled={!apiMode}
           sendHint={sendHint}
         />
       </div>
+
+      <LeadEmailTimeline leadId={lead.id} />
     </div>
   )
 }

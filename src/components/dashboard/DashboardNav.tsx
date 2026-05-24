@@ -1,12 +1,29 @@
 import { NavLink } from 'react-router-dom'
-import { DASHBOARD_BASE } from '@/constants/routes'
+import {
+  ChartBarStackedIcon,
+  ChartIncreaseIcon,
+  Mail01Icon,
+  Tag01Icon,
+  UserMultiple02Icon,
+} from '@hugeicons/core-free-icons'
+import { HugeiconsIcon } from '@hugeicons/react'
+import { DASHBOARD_BASE, OUTREACH_PATH } from '@/constants/routes'
 import { cn } from '@/lib/utils'
 
-export const dashboardNavItems = [
-  { to: DASHBOARD_BASE, label: 'Leads', end: true },
-  { to: `${DASHBOARD_BASE}/categories`, label: 'Categories' },
-  { to: `${DASHBOARD_BASE}/analytics/pipeline`, label: 'Pipeline' },
-  { to: `${DASHBOARD_BASE}/analytics/roi`, label: 'ROI' },
+const dashboardNavItems = [
+  { to: DASHBOARD_BASE, label: 'Leads', end: true, icon: UserMultiple02Icon },
+  { to: OUTREACH_PATH, label: 'Outreach', icon: Mail01Icon },
+  { to: `${DASHBOARD_BASE}/categories`, label: 'Categories', icon: Tag01Icon },
+  {
+    to: `${DASHBOARD_BASE}/analytics/pipeline`,
+    label: 'Pipeline',
+    icon: ChartBarStackedIcon,
+  },
+  {
+    to: `${DASHBOARD_BASE}/analytics/roi`,
+    label: 'ROI',
+    icon: ChartIncreaseIcon,
+  },
 ] as const
 
 interface DashboardNavProps {
@@ -25,14 +42,27 @@ export function DashboardNav({ onNavigate, className }: DashboardNavProps) {
           onClick={onNavigate}
           className={({ isActive }) =>
             cn(
-              'rounded-md px-3 py-2.5 text-sm font-medium transition-colors md:py-2 md:text-xs',
+              'flex items-center gap-2.5 rounded-md px-3 py-2.5 text-sm font-medium transition-colors md:py-2 md:text-xs',
               isActive
                 ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                 : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-foreground',
             )
           }
         >
-          {item.label}
+          {({ isActive }) => (
+            <>
+              <HugeiconsIcon
+                icon={item.icon}
+                strokeWidth={2}
+                className={cn(
+                  'size-4 shrink-0',
+                  isActive ? 'text-sidebar-accent-foreground' : 'text-muted-foreground',
+                )}
+                aria-hidden
+              />
+              <span>{item.label}</span>
+            </>
+          )}
         </NavLink>
       ))}
     </nav>

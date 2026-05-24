@@ -61,9 +61,54 @@ export interface SendEmailResponse {
   subject: string
 }
 
+export interface ScoreBreakdownItem {
+  signal: string
+  points: number
+  met: boolean
+}
+
+export interface LeadScoreBreakdown {
+  total: number
+  tier: ApiLeadTier
+  breakdown: ScoreBreakdownItem[]
+}
+
+/** GET /api/leads/:id/score */
+export type LeadScoreBreakdownResponse =
+  | LeadScoreBreakdown
+  | { scoreBreakdown: LeadScoreBreakdown }
+
 export interface ApiErrorBody {
   error: string
 }
 
 /** GET /api/leads — array or wrapped list depending on backend version */
 export type LeadsListResponse = ApiLead[] | { leads: ApiLead[] }
+
+/** POST /api/leads — JSON body (snake_case, matches spreadsheet columns) */
+export interface CreateLeadApiBody {
+  category_id: string
+  first_name: string
+  last_name?: string
+  email: string
+  company?: string
+  job_title?: string
+  phone?: string
+  source?: string
+  initial_message?: string
+}
+
+/** UI / hook input — mapped to {@link CreateLeadApiBody} before POST */
+export interface CreateLeadRequest {
+  categoryId: string
+  firstName: string
+  lastName?: string
+  email: string
+  company?: string
+  jobTitle?: string
+  phone?: string
+  source?: string
+  initialMessage?: string
+}
+
+export type CreateLeadResponse = LeadDetailResponse | { lead: ApiLead }

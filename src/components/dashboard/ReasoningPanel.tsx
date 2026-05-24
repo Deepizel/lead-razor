@@ -1,3 +1,4 @@
+import { ScoreBreakdownChecklist } from '@/components/lead/ScoreBreakdownChecklist'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Lead } from '@/types/lead'
@@ -28,7 +29,7 @@ export function ReasoningPanel({ lead }: { lead: Lead }) {
         <Tabs defaultValue="score">
           <TabsList className="grid h-auto w-full grid-cols-3">
             <TabsTrigger value="score" className="flex-1">
-              Score
+              Breakdown
             </TabsTrigger>
             <TabsTrigger value="intent" className="flex-1">
               Intent
@@ -38,7 +39,10 @@ export function ReasoningPanel({ lead }: { lead: Lead }) {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="score" className="mt-4">
-            <BulletList items={lead.reasoning} />
+            <ScoreBreakdownChecklist
+              leadId={lead.id}
+              fallbackReasoning={lead.reasoning}
+            />
           </TabsContent>
           <TabsContent value="intent" className="mt-4">
             <BulletList items={lead.intentSignals} />

@@ -5,11 +5,18 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { hasApiBaseUrl } from '@/lib/api-client'
+import { cn } from '@/lib/utils'
 import type { Lead } from '@/types/lead'
+
+export interface SendEmailPayload {
+  useSnapshot?: boolean
+  subject?: string
+  body?: string
+}
 
 interface ActionButtonGroupProps {
   lead: Lead
-  onSendEmail?: () => void
+  onSendEmail?: (payload: SendEmailPayload) => void
   isSending?: boolean
   sendDisabled?: boolean
   sendHint?: string
@@ -22,10 +29,12 @@ export function ActionButtonGroup({
   sendDisabled = false,
   sendHint,
 }: ActionButtonGroupProps) {
-  const useApiEmail = hasApiBaseUrl() && Boolean(lead.emailSubject)
+  const apiMode = hasApiBaseUrl()
+  const useApiEmail = apiMode && Boolean(lead.emailSubject || lead.hasSnapshot)
   const [subject, setSubject] = useState(lead.emailSubject ?? '')
   const [body, setBody] = useState(lead.emailBody ?? lead.draftEmail)
   const [legacyDraft, setLegacyDraft] = useState(lead.draftEmail)
+  const [useSnapshot, setUseSnapshot] = useState(true)
 
   useEffect(() => {
     setSubject(lead.emailSubject ?? '')
@@ -33,9 +42,19 @@ export function ActionButtonGroup({
     setLegacyDraft(lead.draftEmail)
   }, [lead.id, lead.emailSubject, lead.emailBody, lead.draftEmail])
 
-  const apiMode = hasApiBaseUrl()
   const noSnapshot = apiMode && !lead.hasSnapshot
-  const alreadySent = Boolean(lead.emailSentAt)
+
+  const handleSend = () => {
+    if (useApiEmail && useSnapshot) {
+      onSendEmail?.({ useSnapshot: true })
+      return
+    }
+    onSendEmail?.({
+      useSnapshot: false,
+      subject: useApiEmail ? subject : undefined,
+      body: useApiEmail ? body : legacyDraft,
+    })
+  }
 
   return (
     <Card className="h-full">
@@ -50,27 +69,47 @@ export function ActionButtonGroup({
       <CardContent className="flex flex-col gap-3">
         {useApiEmail ? (
           <>
+            <label className="flex items-center gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={useSnapshot}
+                onChange={(e) => setUseSnapshot(e.target.checked)}
+                className="rounded border-border"
+              />
+              Send snapshot as-is
+            </label>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="email-subject">Subject</Label>
               <Input
                 id="email-subject"
                 value={subject}
-                readOnly
-                className="bg-muted/30"
+                onChange={(e) => {
+                  setSubject(e.target.value)
+                  setUseSnapshot(false)
+                }}
+                readOnly={useSnapshot}
+                className={useSnapshot ? 'bg-muted/30' : undefined}
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="email-body">Body</Label>
               <Textarea
                 id="email-body"
-                className="min-h-[180px] resize-y bg-muted/30"
+                className={cn(
+                  'min-h-[180px] resize-y',
+                  useSnapshot && 'bg-muted/30',
+                )}
                 value={body}
-                readOnly
+                onChange={(e) => {
+                  setBody(e.target.value)
+                  setUseSnapshot(false)
+                }}
+                readOnly={useSnapshot}
               />
             </div>
             {lead.emailSentAt && (
               <p className="text-[0.625rem] text-muted-foreground">
-                Sent {new Date(lead.emailSentAt).toLocaleString()}
+                Last snapshot send {new Date(lead.emailSentAt).toLocaleString()}
               </p>
             )}
           </>
@@ -92,10 +131,10 @@ export function ActionButtonGroup({
 
         <Button
           className="w-full"
-          disabled={sendDisabled || isSending || noSnapshot || alreadySent}
-          onClick={onSendEmail}
+          disabled={sendDisabled || isSending || noSnapshot}
+          onClick={handleSend}
         >
-          {isSending ? 'Sending…' : alreadySent ? 'Email sent' : 'Send email'}
+          {isSending ? 'Sending…' : 'Send email'}
         </Button>
         <Button variant="outline" className="w-full" disabled={apiMode}>
           Generate follow-up
