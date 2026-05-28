@@ -57,4 +57,12 @@ export const apiPaths = {
     tiers: '/api/reports/tiers',
     export: '/api/reports/export',
   },
+  settings: {
+    emailIdentityAlias: '/api/settings/email-identity',
+    emailIdentities: '/api/settings/email-identities',
+    emailIdentityDetail: (id: string) => `/api/settings/email-identities/${id}`,
+    emailIdentityDefault: '/api/settings/email-identities/default',
+    emailIdentitySetDefault: (id: string) => `/api/settings/email-identities/${id}/default`,
+    emailIdentityTest: (id: string) => `/api/settings/email-identities/${id}/test`,
+  },
 } as const

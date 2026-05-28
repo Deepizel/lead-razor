@@ -3,8 +3,12 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoutes from '@/core/guards/ProtectedRoutes'
 import GuestOnlyRoute from '@/core/guards/GuestOnlyRoute'
 import { DashboardLayout } from '@/layouts/DashboardLayout'
+import { SettingsLayout } from '@/components/settings/SettingsLayout'
 import { Skeleton } from '@/components/ui/skeleton'
-import { DASHBOARD_BASE } from '@/constants/routes'
+import {
+  DASHBOARD_BASE,
+  SETTINGS_PATH,
+} from '@/constants/routes'
 
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage'))
 const VerifyEmailPage = lazy(() => import('@/pages/auth/VerifyEmailPage'))
@@ -18,6 +22,13 @@ const PipelineAnalyticsPage = lazy(
 const ROIDashboardPage = lazy(() => import('@/pages/dashboard/ROIDashboardPage'))
 const CategoriesPage = lazy(() => import('@/pages/categories/CategoriesPage'))
 const OutreachPage = lazy(() => import('@/pages/dashboard/OutreachPage'))
+const SettingsProfileTab = lazy(() => import('@/pages/settings/SettingsProfileTab'))
+const SettingsEmailIdentityTab = lazy(
+  () => import('@/pages/settings/SettingsEmailIdentityTab'),
+)
+const SettingsNotificationsTab = lazy(
+  () => import('@/pages/settings/SettingsNotificationsTab'),
+)
 
 function PageLoader() {
   return (
@@ -47,6 +58,15 @@ export default function AppRouter() {
               <Route path="categories" element={<CategoriesPage />} />
               <Route path="analytics/pipeline" element={<PipelineAnalyticsPage />} />
               <Route path="analytics/roi" element={<ROIDashboardPage />} />
+            </Route>
+
+            <Route path={SETTINGS_PATH} element={<DashboardLayout />}>
+              <Route element={<SettingsLayout />}>
+                <Route index element={<Navigate to="profile" replace />} />
+                <Route path="profile" element={<SettingsProfileTab />} />
+                <Route path="email-identity" element={<SettingsEmailIdentityTab />} />
+                <Route path="notifications" element={<SettingsNotificationsTab />} />
+              </Route>
             </Route>
           </Route>
 

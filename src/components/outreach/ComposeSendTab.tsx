@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +16,7 @@ import {
   useRecipientsPreviewQuery,
   useSendEmail,
 } from '@/hooks/useEmails'
+import { useEmailIdentities } from '@/hooks/useSettings'
 import { useLeads } from '@/hooks/useLeads'
 import { notify } from '@/stores/toastStore'
 import type { ApiLeadTier } from '@/types/api-lead'
@@ -36,9 +37,11 @@ export function ComposeSendTab() {
   const [subject, setSubject] = useState('')
   const [body, setBody] = useState('')
   const [useSnapshot, setUseSnapshot] = useState(true)
+  const [emailIdentityId, setEmailIdentityId] = useState<string>('')
 
   const { data: leads = [] } = useLeads()
   const { data: categories = [] } = useCategories()
+  const { data: identities = [] } = useEmailIdentities()
   const draft = useDraftEmail()
   const send = useSendEmail()
 
@@ -56,6 +59,12 @@ export function ComposeSendTab() {
 
   const recipientCount = preview.data?.count ?? 0
   const bulkLeadIds = preview.data?.leads.map((l) => l.id) ?? []
+  const defaultIdentityId = identities.find((i) => i.isDefault)?.id
+
+  useEffect(() => {
+    if (!defaultIdentityId) return
+    setEmailIdentityId((current) => (current ? current : defaultIdentityId))
+  }, [defaultIdentityId])
 
   const handleDraft = async () => {
     if (!leadId) {
@@ -86,8 +95,8 @@ export function ComposeSendTab() {
         }
         await send.mutateAsync(
           useSnapshot
-            ? { leadId, useSnapshot: true }
-            : { leadId, subject: subject.trim(), body: body.trim() },
+            ? { leadId, useSnapshot: true, emailIdentityId }
+            : { leadId, subject: subject.trim(), body: body.trim(), emailIdentityId },
         )
       } else {
         if (!subject.trim() || !body.trim()) {
@@ -102,6 +111,7 @@ export function ComposeSendTab() {
           leadIds: bulkLeadIds,
           subject: subject.trim(),
           body: body.trim(),
+          emailIdentityId,
         })
       }
       setSubject('')
@@ -218,6 +228,27 @@ export function ComposeSendTab() {
             </p>
           </div>
         )}
+
+        <div className="space-y-1.5">
+          <Label htmlFor="compose-identity">Sender identity</Label>
+          <Select value={emailIdentityId} onValueChange={setEmailIdentityId}>
+            <SelectTrigger id="compose-identity">
+              <SelectValue placeholder="Default sender" />
+            </SelectTrigger>
+            <SelectContent>
+              {identities.map((identity) => (
+                <SelectItem key={identity.id} value={identity.id}>
+                  {identity.label} {identity.isDefault ? '• default' : ''}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {identities.length === 0 && (
+            <p className="text-xs text-destructive">
+              No sender identity configured. Add one in Settings → Email identities.
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-4">

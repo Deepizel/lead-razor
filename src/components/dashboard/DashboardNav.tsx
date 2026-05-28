@@ -6,11 +6,12 @@ import {
   ChartIncreaseIcon,
   FileExportIcon,
   Mail01Icon,
+  Settings02Icon,
   Tag01Icon,
   UserMultiple02Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { DASHBOARD_BASE, OUTREACH_PATH } from '@/constants/routes'
+import { DASHBOARD_BASE, OUTREACH_PATH, SETTINGS_PATH } from '@/constants/routes'
 import { cn } from '@/lib/utils'
 
 const dashboardNavItems = [
@@ -27,6 +28,7 @@ const dashboardNavItems = [
     label: 'ROI',
     icon: ChartIncreaseIcon,
   },
+  { to: SETTINGS_PATH, label: 'Settings', icon: Settings02Icon, end: false },
 ] as const
 
 interface DashboardNavProps {
