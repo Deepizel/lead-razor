@@ -93,9 +93,13 @@ export async function sendLeadEmailShortcutRemote(
   leadId: string,
   body: LeadSendEmailShortcutRequest = { useSnapshot: true },
 ): Promise<SendEmailResponse> {
+  const payload = {
+    leadId,
+    ...body,
+  }
   return apiRequest<SendEmailResponse>(apiPaths.leads.sendEmail(leadId), {
     method: 'POST',
-    body: JSON.stringify(body),
+    body: JSON.stringify(payload),
     timeoutMs: 60_000,
   })
 }

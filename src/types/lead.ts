@@ -13,6 +13,7 @@ export interface Lead {
   riskFlags: string[]
   draftEmail: string
   source: string
+  categoryId?: string
   lastAction: string
   createdAt: string
   /** Populated from API snapshot when available */
@@ -27,6 +28,8 @@ export type UploadedDatePreset = 'all' | '7d' | '30d' | '90d' | 'custom'
 
 export interface LeadFilters {
   status: LeadStatus | 'all'
+  /** `all` = every category; otherwise a category UUID */
+  categoryId: string
   minScore: number
   maxScore: number
   source: string

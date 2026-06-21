@@ -8,10 +8,14 @@ import { cn } from '@/lib/utils'
 import type { LeadEmailTimelineItem } from '@/types/api-email'
 
 const eventStyles: Record<string, string> = {
-  email_sent: 'border-violet-500/40 bg-violet-500/10 text-violet-300',
-  email_opened: 'border-cyan-500/40 bg-cyan-500/10 text-cyan-300',
-  link_clicked: 'border-amber-500/40 bg-amber-500/10 text-amber-300',
-  email_replied: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300',
+  email_sent:
+    'border-violet-500/40 bg-violet-500/10 text-violet-700 dark:text-violet-300',
+  email_opened:
+    'border-cyan-500/40 bg-cyan-500/10 text-cyan-700 dark:text-cyan-300',
+  link_clicked:
+    'border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-300',
+  email_replied:
+    'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300',
 }
 
 function EventDot({ type }: { type: string }) {

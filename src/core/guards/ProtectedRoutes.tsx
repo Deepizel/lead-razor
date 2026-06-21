@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Outlet } from 'react-router-dom'
+import { LOGIN_PATH } from '@/constants/routes'
 import { Skeleton } from '@/components/ui/skeleton'
 import { bootstrapAuthSession } from '@/lib/auth-session'
 import { useAuthStore } from '@/stores/authStore'
@@ -25,7 +26,7 @@ export default function ProtectedRoutes() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/" replace />
+    return <Navigate to={LOGIN_PATH} replace />
   }
 
   return <Outlet />

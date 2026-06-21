@@ -46,6 +46,7 @@ export async function sendEmail(payload: SendEmailRequest) {
 
   if (useSnapshot && !hasCustomCopy) {
     return sendLeadEmailShortcutRemote(single.leadId, {
+      leadId: single.leadId,
       useSnapshot: true,
       emailIdentityId: single.emailIdentityId,
     })

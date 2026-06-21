@@ -134,6 +134,7 @@ export interface LeadEmailsTimelineResponse {
 
 /** POST /api/leads/:id/email/send shortcut */
 export interface LeadSendEmailShortcutRequest {
+  leadId?: string
   useSnapshot?: boolean
   subject?: string
   body?: string

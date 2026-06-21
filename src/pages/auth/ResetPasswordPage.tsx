@@ -4,6 +4,7 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { LOGIN_PATH } from '@/constants/routes'
 import { useResetPassword } from '@/hooks/useAuth'
 
 export default function ResetPasswordPage() {
@@ -76,7 +77,7 @@ export default function ResetPasswordPage() {
           )}
 
           <Button variant="link" asChild className="w-full">
-            <Link to="/">Back to sign in</Link>
+            <Link to={LOGIN_PATH}>Back to sign in</Link>
           </Button>
         </div>
       </div>

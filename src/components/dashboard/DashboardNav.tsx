@@ -8,14 +8,26 @@ import {
   Mail01Icon,
   Settings02Icon,
   Tag01Icon,
+  UserGroupIcon,
   UserMultiple02Icon,
 } from '@hugeicons/core-free-icons'
 import { HugeiconsIcon } from '@hugeicons/react'
-import { DASHBOARD_BASE, OUTREACH_PATH, SETTINGS_PATH } from '@/constants/routes'
+import { DASHBOARD_BASE, OUTREACH_PATH, SETTINGS_PATH, USERS_PATH } from '@/constants/routes'
+import { useIsAdmin } from '@/hooks/useIsAdmin'
 import { cn } from '@/lib/utils'
 
-const dashboardNavItems = [
+type DashboardNavItem = {
+  to: string
+  label: string
+  icon: typeof UserMultiple02Icon
+  end?: boolean
+  /** Shown only when the signed-in user has role admin */
+  adminOnly?: boolean
+}
+
+const sidebarNavItems: DashboardNavItem[] = [
   { to: DASHBOARD_BASE, label: 'Leads', end: true, icon: UserMultiple02Icon },
+  { to: USERS_PATH, label: 'Users', end: true, icon: UserGroupIcon, adminOnly: true },
   { to: OUTREACH_PATH, label: 'Outreach', icon: Mail01Icon },
   { to: `${DASHBOARD_BASE}/categories`, label: 'Categories', icon: Tag01Icon },
   {
@@ -29,7 +41,7 @@ const dashboardNavItems = [
     icon: ChartIncreaseIcon,
   },
   { to: SETTINGS_PATH, label: 'Settings', icon: Settings02Icon, end: false },
-] as const
+]
 
 interface DashboardNavProps {
   onNavigate?: () => void
@@ -38,6 +50,8 @@ interface DashboardNavProps {
 
 export function DashboardNav({ onNavigate, className }: DashboardNavProps) {
   const [reportOpen, setReportOpen] = useState(false)
+  const isAdmin = useIsAdmin()
+  const visibleNavItems = sidebarNavItems.filter((item) => !item.adminOnly || isAdmin)
 
   const openReport = () => {
     setReportOpen(true)
@@ -47,11 +61,11 @@ export function DashboardNav({ onNavigate, className }: DashboardNavProps) {
   return (
     <>
       <nav className={cn('flex flex-col gap-1', className)}>
-        {dashboardNavItems.map((item) => (
+        {visibleNavItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            end={'end' in item ? item.end : undefined}
+            end={item.end}
             onClick={onNavigate}
             className={({ isActive }) =>
               cn(

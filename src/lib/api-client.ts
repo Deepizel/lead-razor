@@ -53,7 +53,8 @@ function buildHeaders(init: RequestInit, skipAuth: boolean): Headers {
 
 function shouldForceLogout(status: number, hadAuth: boolean): boolean {
   if (!hadAuth) return false
-  return status === 401 || status === 400
+  // Only session/auth failures — not validation errors (400) from business logic
+  return status === 401
 }
 
 async function parseErrorMessage(response: Response): Promise<string> {
@@ -123,12 +124,21 @@ export async function apiRequest<T>(
     }
 
     const contentType = response.headers.get('content-type') ?? ''
+    const text = await response.text()
+
+    if (!text.trim()) {
+      return undefined as T
+    }
+
     if (!contentType.includes('application/json')) {
-      const text = await response.text()
       return text as T
     }
 
-    return response.json() as Promise<T>
+    try {
+      return JSON.parse(text) as T
+    } catch {
+      return text as T
+    }
   } catch (err) {
     if (err instanceof ApiError) throw err
     if (err instanceof Error && err.name === 'AbortError') {

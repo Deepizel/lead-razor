@@ -15,6 +15,7 @@ import type {
 export interface FetchLeadsListParams {
   tier?: 'hot' | 'warm' | 'cold'
   sort?: 'score' | 'created_at'
+  categoryId?: string
 }
 
 export async function fetchLeadsListRemote(
@@ -22,6 +23,10 @@ export async function fetchLeadsListRemote(
 ): Promise<LeadsListResponse> {
   const qs = new URLSearchParams()
   if (params.tier) qs.set('tier', params.tier)
+  if (params.categoryId) {
+    qs.set('categoryId', params.categoryId)
+    qs.set('category_id', params.categoryId)
+  }
   qs.set('sort', params.sort ?? 'score')
   const query = qs.toString()
   const path = query ? `${apiPaths.leads.list}?${query}` : apiPaths.leads.list

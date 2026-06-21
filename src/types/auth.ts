@@ -1,7 +1,13 @@
+import type { UserRole, UserStatus } from '@/types/waitlist'
+
 export interface AuthUser {
   id: string
   email: string
   emailVerified: boolean
+  role?: UserRole
+  status?: UserStatus
+  firstName?: string
+  lastName?: string
 }
 
 export interface AuthTokens {

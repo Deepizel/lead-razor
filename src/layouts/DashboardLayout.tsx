@@ -16,11 +16,11 @@ export function DashboardLayout() {
   const logout = useLogout()
 
   return (
-    <div className="flex min-h-svh bg-background">
+    <div className="flex h-svh overflow-hidden bg-background">
       <DashboardSidebar />
       <MobileNavSheet />
 
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-3 sm:h-12 sm:px-4 md:px-6">
           <Button
             variant="outline"
@@ -58,7 +58,7 @@ export function DashboardLayout() {
           </div>
         </header>
         <Separator className="hidden sm:block" />
-        <main className="flex-1 overflow-auto p-4 pb-20 sm:p-5 sm:pb-5 md:p-6 md:pb-6">
+        <main className="min-h-0 flex-1 overflow-y-auto p-4 pb-20 sm:p-5 sm:pb-5 md:p-6 md:pb-6">
           <Outlet />
         </main>
       </div>

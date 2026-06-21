@@ -57,6 +57,19 @@ export const apiPaths = {
     tiers: '/api/reports/tiers',
     export: '/api/reports/export',
   },
+  waitlist: {
+    join: '/api/waitlist',
+    setPassword: '/api/waitlist/set-password',
+  },
+  admin: {
+    waitlist: '/api/admin/waitlist',
+    waitlistApprove: (id: string) => `/api/admin/waitlist/${id}/approve`,
+    waitlistReject: (id: string) => `/api/admin/waitlist/${id}/reject`,
+    users: '/api/admin/users',
+    userApprove: (id: string) => `/api/admin/users/${id}/approve`,
+    userDeactivate: (id: string) => `/api/admin/users/${id}/deactivate`,
+    userRole: (id: string) => `/api/admin/users/${id}/role`,
+  },
   settings: {
     emailIdentityAlias: '/api/settings/email-identity',
     emailIdentities: '/api/settings/email-identities',

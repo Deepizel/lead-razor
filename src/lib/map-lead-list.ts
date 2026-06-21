@@ -1,3 +1,4 @@
+import { CATEGORY_FILTER_ALL } from '@/constants/filters'
 import type { ApiLead } from '@/types/api-lead'
 import type { Lead } from '@/types/lead'
 import { getUploadedDateRange, isWithinUploadedRange } from '@/lib/lead-utils'
@@ -15,6 +16,7 @@ export function mapApiLeadToUi(lead: ApiLead): Lead {
     score: lead.score,
     status: lead.tier,
     source: lead.source,
+    categoryId: lead.category_id,
     lastAction: lead.last_event_type ?? 'No recent activity',
     createdAt: lead.created_at,
     reasoning: lead.initial_message ? [lead.initial_message] : [],
@@ -35,6 +37,10 @@ export function applyLeadFilters(leads: Lead[], filters: LeadFilters): Lead[] {
 
   if (filters.status !== 'all') {
     result = result.filter((lead) => lead.status === filters.status)
+  }
+
+  if (filters.categoryId !== CATEGORY_FILTER_ALL) {
+    result = result.filter((lead) => lead.categoryId === filters.categoryId)
   }
 
   if (filters.source !== 'All') {
