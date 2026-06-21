@@ -30,7 +30,7 @@ export function HotLeadsWeekCard({ data }: HotLeadsWeekCardProps) {
         <p
           className={cn(
             'text-sm font-medium',
-            positive ? 'text-emerald-400' : 'text-amber-400',
+            positive ? 'text-emerald-700 dark:text-emerald-400' : 'text-amber-700 dark:text-amber-400',
           )}
         >
           {positive ? '+' : ''}

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { SOURCE_FILTER_ALL } from '@/constants/filters'
+import { CATEGORY_FILTER_ALL, SOURCE_FILTER_ALL } from '@/constants/filters'
 import type { LeadFilters } from '@/types/lead'
 
 interface UiState {
@@ -17,6 +17,7 @@ interface UiState {
 
 const defaultFilters: LeadFilters = {
   status: 'all',
+  categoryId: CATEGORY_FILTER_ALL,
   minScore: 0,
   maxScore: 100,
   source: SOURCE_FILTER_ALL,

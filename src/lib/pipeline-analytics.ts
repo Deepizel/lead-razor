@@ -2,9 +2,9 @@ import type { TierCounts } from '@/types/api-pipeline'
 import type { LeadStatus } from '@/types/lead'
 
 export const TIER_CHART_COLORS: Record<LeadStatus, string> = {
-  hot: 'oklch(0.696 0.17 162.48)',
-  warm: 'oklch(0.769 0.188 70.08)',
-  cold: 'oklch(0.55 0 0)',
+  hot: 'oklch(0.62 0.22 25)',
+  warm: 'oklch(0.72 0.17 55)',
+  cold: 'oklch(0.78 0.11 210)',
 }
 
 export const TIER_LABELS: Record<LeadStatus, string> = {

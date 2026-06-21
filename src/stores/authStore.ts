@@ -11,6 +11,7 @@ interface AuthState {
   accessTokenExpiresAt: number | null
   user: AuthUser | null
   setSession: (session: AuthSession) => void
+  updateUser: (user: AuthUser) => void
   patchTokens: (accessToken: string, refreshToken: string, expiresAt?: number) => void
   clearSession: () => void
   isAuthenticated: () => boolean
@@ -31,6 +32,8 @@ export const useAuthStore = create<AuthState>()(
           accessTokenExpiresAt: session.accessTokenExpiresAt,
           user: session.user,
         }),
+
+      updateUser: (user) => set({ user }),
 
       patchTokens: (accessToken, refreshToken, expiresAt) =>
         set({

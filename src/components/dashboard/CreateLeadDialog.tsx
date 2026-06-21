@@ -11,13 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { CategorySelect } from '@/components/dashboard/CategorySelect'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Textarea } from '@/components/ui/textarea'
 import {
@@ -154,22 +148,11 @@ export function CreateLeadDialog({ open, onOpenChange }: CreateLeadDialogProps) 
                 first.
               </p>
             ) : (
-              <Select
+              <CategorySelect
                 value={form.categoryId || undefined}
                 onValueChange={(v) => setField('categoryId', v)}
                 disabled={create.isPending}
-              >
-                <SelectTrigger id="create-lead-category" className="w-full">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={c.id} className="truncate">
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             )}
           </div>
 

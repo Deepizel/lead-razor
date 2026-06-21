@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -9,6 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { CATEGORY_FILTER_ALL } from '@/constants/filters'
+import { useCategories } from '@/hooks/useCategories'
 import { useLeads } from '@/hooks/useLeads'
 import { deriveLeadSourceOptions } from '@/lib/derive-lead-sources'
 import { getUploadedDateRange } from '@/lib/lead-utils'
@@ -35,6 +39,12 @@ export function LeadsFilters() {
   const setFilters = useUiStore((s) => s.setFilters)
   const resetFilters = useUiStore((s) => s.resetFilters)
   const { data: leads } = useLeads()
+  const {
+    data: categories = [],
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+    error: categoriesFetchError,
+  } = useCategories()
 
   const leadSources = useMemo(() => deriveLeadSourceOptions(leads), [leads])
 
@@ -70,6 +80,47 @@ export function LeadsFilters() {
             ))}
           </SelectContent>
         </Select>
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <Label htmlFor="filter-category">Category</Label>
+        {categoriesLoading ? (
+          <Skeleton className="h-8 w-full lg:min-w-[160px]" />
+        ) : categoriesError ? (
+          <p className="text-xs text-destructive">
+            {categoriesFetchError instanceof Error
+              ? categoriesFetchError.message
+              : 'Could not load categories.'}
+          </p>
+        ) : (
+          <Select
+            value={filters.categoryId}
+            onValueChange={(value) => setFilters({ categoryId: value })}
+          >
+            <SelectTrigger id="filter-category" className="w-full lg:min-w-[160px]" size="sm">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={CATEGORY_FILTER_ALL}>All categories</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        {!categoriesLoading && !categoriesError && categories.length === 0 && (
+          <p className="text-xs text-muted-foreground">
+            No categories yet.{' '}
+            <Link
+              to="/dashboard/categories"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Create one
+            </Link>
+          </p>
+        )}
       </div>
 
       <div className="flex flex-col gap-1.5">

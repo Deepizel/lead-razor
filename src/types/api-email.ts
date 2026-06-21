@@ -36,6 +36,7 @@ export interface SendEmailSingleRequest {
   subject?: string
   body?: string
   useSnapshot?: boolean
+  emailIdentityId?: string
 }
 
 /** POST /api/emails/send — bulk */
@@ -43,6 +44,7 @@ export interface SendEmailBulkRequest {
   leadIds: string[]
   subject: string
   body: string
+  emailIdentityId?: string
 }
 
 export type SendEmailRequest = SendEmailSingleRequest | SendEmailBulkRequest
@@ -132,7 +134,9 @@ export interface LeadEmailsTimelineResponse {
 
 /** POST /api/leads/:id/email/send shortcut */
 export interface LeadSendEmailShortcutRequest {
+  leadId?: string
   useSnapshot?: boolean
   subject?: string
   body?: string
+  emailIdentityId?: string
 }

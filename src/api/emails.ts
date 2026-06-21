@@ -45,13 +45,18 @@ export async function sendEmail(payload: SendEmailRequest) {
     Boolean(single.subject?.trim()) || Boolean(single.body?.trim())
 
   if (useSnapshot && !hasCustomCopy) {
-    return sendLeadEmailShortcutRemote(single.leadId, { useSnapshot: true })
+    return sendLeadEmailShortcutRemote(single.leadId, {
+      leadId: single.leadId,
+      useSnapshot: true,
+      emailIdentityId: single.emailIdentityId,
+    })
   }
 
   return sendOutreachEmailRemote({
     leadId: single.leadId,
     subject: single.subject?.trim(),
     body: single.body?.trim(),
+    emailIdentityId: single.emailIdentityId,
     useSnapshot: useSnapshot && !hasCustomCopy ? true : undefined,
   })
 }
@@ -78,6 +83,7 @@ export interface SendLeadEmailOptions {
   useSnapshot?: boolean
   subject?: string
   body?: string
+  emailIdentityId?: string
 }
 
 /** Lead detail shortcut — delegates to `sendEmail` */
@@ -85,11 +91,12 @@ export async function sendLeadEmail(
   leadId: string,
   options: SendLeadEmailOptions = {},
 ) {
-  const { useSnapshot = true, subject, body } = options
+  const { useSnapshot = true, subject, body, emailIdentityId } = options
   return sendEmail({
     leadId,
     useSnapshot,
     subject,
     body,
+    emailIdentityId,
   })
 }

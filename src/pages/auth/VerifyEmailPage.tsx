@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
+import { LOGIN_PATH } from '@/constants/routes'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 import { Button } from '@/components/ui/button'
 import { verifyEmail } from '@/api/auth-remote'
@@ -56,7 +57,7 @@ export default function VerifyEmailPage() {
             </p>
           )}
           <Button asChild className="w-full">
-            <Link to="/">Go to sign in</Link>
+            <Link to={LOGIN_PATH}>Go to sign in</Link>
           </Button>
         </div>
       </div>

@@ -15,6 +15,7 @@ import {
   mapApiLeadToUi,
   normalizeLeadsListResponse,
 } from '@/lib/map-lead-list'
+import { CATEGORY_FILTER_ALL } from '@/constants/filters'
 import { assertApiConfigured } from '@/lib/require-api'
 import type { Lead, LeadFilters } from '@/types/lead'
 import type {
@@ -31,7 +32,10 @@ export async function fetchLeads(filters?: LeadFilters): Promise<Lead[]> {
       ? (filters.status as 'hot' | 'warm' | 'cold')
       : undefined
 
-  const data = await fetchLeadsListRemote({ tier, sort: 'score' })
+  const categoryId =
+    filters && filters.categoryId !== CATEGORY_FILTER_ALL ? filters.categoryId : undefined
+
+  const data = await fetchLeadsListRemote({ tier, sort: 'score', categoryId })
   const apiLeads = normalizeLeadsListResponse(data)
   let leads = apiLeads.map(mapApiLeadToUi)
 

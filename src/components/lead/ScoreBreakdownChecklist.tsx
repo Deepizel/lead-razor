@@ -82,7 +82,7 @@ export function ScoreBreakdownChecklist({
               className={cn(
                 'mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full',
                 item.met
-                  ? 'bg-emerald-500/20 text-emerald-400'
+                  ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-400'
                   : 'bg-muted text-muted-foreground',
               )}
               aria-hidden
@@ -105,7 +105,7 @@ export function ScoreBreakdownChecklist({
             <span
               className={cn(
                 'shrink-0 font-mono text-[0.625rem] font-medium tabular-nums',
-                item.met ? 'text-emerald-400' : 'text-muted-foreground',
+                item.met ? 'text-emerald-700 dark:text-emerald-400' : 'text-muted-foreground',
               )}
             >
               {item.met ? '+' : ''}

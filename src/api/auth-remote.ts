@@ -27,13 +27,40 @@ interface RawUser {
   email: string
   emailVerified?: boolean
   email_verified?: boolean
+  role?: string
+  status?: string
+  firstName?: string
+  first_name?: string
+  lastName?: string
+  last_name?: string
+}
+
+/** `/api/auth/me` returns `{ user: { ... } }`; login/refresh may nest `user` too */
+function unwrapRawUser(raw: unknown): RawUser {
+  if (!raw || typeof raw !== 'object') {
+    throw new Error('Invalid user response from server')
+  }
+  const o = raw as Record<string, unknown>
+  if (o.user && typeof o.user === 'object') {
+    return o.user as RawUser
+  }
+  return raw as RawUser
 }
 
 function mapUser(raw: RawUser): AuthUser {
+  const role = raw.role === 'admin' ? 'admin' : raw.role === 'user' ? 'user' : undefined
+  const status =
+    raw.status === 'active' || raw.status === 'deactivated' || raw.status === 'pending'
+      ? raw.status
+      : undefined
   return {
     id: raw.id,
     email: raw.email,
     emailVerified: Boolean(raw.emailVerified ?? raw.email_verified),
+    role,
+    status,
+    firstName: raw.firstName ?? raw.first_name ?? undefined,
+    lastName: raw.lastName ?? raw.last_name ?? undefined,
   }
 }
 
@@ -90,8 +117,8 @@ export async function refreshSession(body: RefreshRequest): Promise<AuthSession>
 }
 
 export async function fetchMe(): Promise<AuthUser> {
-  const raw = await apiRequest<RawUser>(apiPaths.auth.me)
-  return mapUser(raw)
+  const raw = await apiRequest<unknown>(apiPaths.auth.me, { silentError: true })
+  return mapUser(unwrapRawUser(raw))
 }
 
 export async function forgotPassword(body: ForgotPasswordRequest): Promise<AuthMessageResponse> {
